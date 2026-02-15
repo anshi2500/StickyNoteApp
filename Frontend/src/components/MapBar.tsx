@@ -30,10 +30,16 @@ export default function MapBar() {
   // };
 
   const [createSticky, setCreateSticky] = useState(false);
+  const [StickiesInRange, setStickiesInRange] = useState([]);
 
-  useEffect(() => {
-    
-  }, [createSticky])
+  const fetchStickiesInRange = async () => {
+    const backendEndpoint = 'http://127.0.0.1:5000/student_courses/' + user['id'];
+    const response = await fetch (backendEndpoint);
+    const data = await response.json();
+
+    setStickiesInRange(data['student_courses'])
+    console.log(data['student_courses'])
+  };
 
   return (
     <header className="sticky top-0 z-40 w-full">
@@ -72,6 +78,17 @@ export default function MapBar() {
               onClick={() => setCreateSticky(!createSticky)}
             >
               Create Sticky
+            </button>
+          </div>
+          <div className="md:hidden flex items-center gap-2">
+            <button
+              className={[
+                "rounded-full px-1.5 py-0.5 text-[8px] font-semibold leading-none",
+                "bg-white/55 border border-white/40 text-[#4B3F66] hover:bg-white/75 scale-80"
+              ].join(" ")}
+              onClick={() => setCreateSticky(!createSticky)}
+            >
+              Explore Stickies
             </button>
           </div>
         </div>
