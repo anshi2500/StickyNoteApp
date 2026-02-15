@@ -3,11 +3,15 @@
 
 import React, { useEffect, useState } from 'react'
 import { useJsApiLoader, GoogleMap, Marker } from '@react-google-maps/api'
+import { useNavigate } from "react-router-dom";
 
 // map spawn point: uofc
 const center = { lat: 51.0802, lng: -114.1304 }
 
 function ViewMap() {
+  // For react router and navigation for now
+  const navigate = useNavigate();
+
   // for making sure map is loaded, else, puts placeholder text
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY
@@ -34,8 +38,18 @@ function ViewMap() {
       </div>
     )
   }
+
+  const logout = () => {
+    localStorage.removeItem("authed");
+    navigate("/login", { replace: true });
+  };
   
-  return (
+  return (<>
+
+    <div>
+      <button onClick={logout}>Log out</button>
+    </div>
+
     <div
     // style={{
     //   display: 'flex',
@@ -89,7 +103,7 @@ function ViewMap() {
     </div>
 
     
-  );
+  </>);
 };
 
 export default ViewMap
