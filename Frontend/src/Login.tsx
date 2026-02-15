@@ -34,7 +34,7 @@ export default function Login() {
     try {
       setLoginLoading(true);
 
-      const res = await fetch(`${API_BASE}/login`, {
+      const res = await fetch(`${API_BASE}/account/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -46,7 +46,7 @@ export default function Login() {
       // If backend returns JSON like { message } on error
       if (!res.ok) {
         const maybe = await res.json().catch(() => null);
-        throw new Error(maybe?.message || `Login failed (${res.status})`);
+        throw new Error(maybe?.error || maybe?.message || `Login failed (${res.status})`);
       }
 
       const data = await res.json().catch(() => ({}));
@@ -105,7 +105,7 @@ export default function Login() {
     try {
       setRegLoading(true);
 
-      const res = await fetch(`${API_BASE}/register`, {
+      const res = await fetch(`${API_BASE}/account/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -320,7 +320,7 @@ export default function Login() {
 
                 <div>
                   <label className="block text-xs sm:text-sm font-medium text-[#4B3F66] mb-2">
-                    Email
+                    Username
                   </label>
                   <div className="rounded-2xl border border-white/60 bg-white/70 px-3 py-2.5 focus-within:ring-4 focus-within:ring-[#D3D3FF]/70">
                     <input
