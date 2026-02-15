@@ -173,7 +173,7 @@ export default function Login() {
             <form
               onSubmit={onSubmit}
               className="w-full rounded-3xl bg-white/75 backdrop-blur-md shadow-[0_20px_60px_rgba(43,37,58,0.18)] border border-white/40
-             p-5 sm:p-8 lg:p-10"
+             p-5 sm:p-8 lg:p-12"
             >
               {/* Mobile brand header */}
               <div className="lg:hidden flex flex-col items-center justify-center gap-2 mb-3">
@@ -233,12 +233,6 @@ export default function Login() {
                 </div>
               </div>
 
-              <div className="flex items-center justify-between mt-3 sm:mt-4">
-                <span className="text-[11px] sm:text-xs text-[#4B3F66]">
-                  demo: any username + password
-                </span>
-              </div>
-
               <button
                 type="submit"
                 disabled={loginLoading}
@@ -248,18 +242,6 @@ export default function Login() {
              disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 {loginLoading ? "Logging in..." : "Log in"}
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  localStorage.setItem("authed", "true");
-                  navigate("/map", { replace: true });
-                }}
-                className="mt-2.5 sm:mt-3 w-full rounded-full py-2.5 sm:py-3 text-xs sm:text-sm font-semibold
-               text-[#2B253A] bg-white/60 border border-white/50 hover:bg-white/80 transition"
-              >
-                Continue as guest
               </button>
 
               <p className="text-center mt-3 sm:mt-5 text-xs sm:text-sm text-[#4B3F66]">
