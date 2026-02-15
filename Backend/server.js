@@ -1,21 +1,14 @@
 const express = require('express');
 const app = express();
-const admin = require("firebase-admin");
+const db = require('./config/firebase')
 
-const serviceAccount = require("./serviceAccountKey.json");
-
- admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
- });
-
-const db = admin.firestore();
 
 app.use(express.json());
 
 
 app.get('/', async (req, res) => {
   try {
-    const snapshot = await db.collection('test').get();
+    const snapshot = await db.collection('test').get(); // this should return nothing because we dont have anything 
     res.send('Firestore read worked');
   } catch (error) {
     console.error(error);
