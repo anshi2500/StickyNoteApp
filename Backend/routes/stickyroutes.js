@@ -58,7 +58,7 @@ router.post('/addnote', async (req, res) => {
 
 router.get('/fetchAll', async (req, res) => {
     try{
-        const { userx,usery } = req.query; // input is just user location and then we can query all the stickies in that area
+        const { userx,usery } = req.body; // input is just user location and then we can query all the stickies in that area
        
         const x = parseFloat(userx); // convert these to floats 
         const y = parseFloat(usery);
