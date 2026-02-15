@@ -119,7 +119,7 @@ function ViewMap() {
 
         {/* center marker overlay */}
         <div 
-        className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-0 -translate-y-22">
+        className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-0 -translate-y-20">
           <img src={crosshair} alt="center crosshair" className="h-4 w-4" />
         </div>
 
