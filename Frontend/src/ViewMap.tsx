@@ -1,6 +1,9 @@
 // google maps api with react source: Mafia Codes on YouTube
 // https://www.youtube.com/watch?v=iP3DnhCUIsE
 
+// adding marker on map using touch or tap: Hitesh Sahu on Stackoverflow
+// https://stackoverflow.com/questions/17143129/add-marker-on-android-google-map-via-touch-or-tap
+
 import React, { useEffect, useState } from 'react'
 import { useJsApiLoader, GoogleMap, Marker } from '@react-google-maps/api'
 
@@ -8,23 +11,32 @@ import { useJsApiLoader, GoogleMap, Marker } from '@react-google-maps/api'
 const center = { lat: 51.0802, lng: -114.1304 }
 
 function ViewMap() {
+  // misc ----------------------------------
   // for making sure map is loaded, else, puts placeholder text
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY
   })
 
+
+  // state vars ----------------------------
   // const [map, setMap] = useState(/** @type google.maps.Map */ (null))
   const [map, setMap] = useState<google.maps.Map | null>(null)
 
-  // useEffect(() => {
-  //   if (!map) return; // map not loaded yet
 
-  //   map.setZoom(12);
-  //   map.panTo({ lat: 51.0802, lng: -114.1304 });
-  // }, [map]);
+  // use effects ---------------------------
+  useEffect(() => {
+    if (!map) return; // map not loaded yet
+
+    const listener = map.addListener("click", (e: { latLng: { toJSON: () => any } }) => { 
+      console.log("Map clicked at:", e.latLng?.toJSON())
+    })
+    
+    return () => listener.remove() // cleanup
+
+  }, [map]);
 
 
-
+  // functions ---------------------------
   if (!isLoaded) {
     return (
       <div>
@@ -34,7 +46,9 @@ function ViewMap() {
       </div>
     )
   }
-  
+
+
+  // react component -----------------------
   return (
     <div
     // style={{
