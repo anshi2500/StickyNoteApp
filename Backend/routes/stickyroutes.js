@@ -91,25 +91,33 @@ router.post('/addnote', async (req, res) => {
 
 // fetch all sticky notes from a user
 router.get('/fetchUsersNotes', async (req, res) => {
-  // Retreive the user ID from req body
-  const {userID} = req.body;
+  try{
+    // Retreive the user ID from req body
+    const {userID} = req.body;
+    const notesRef = db.collection('Notes'); // reference to Notes collection
+    // query sticky notes from userID
+    const snapshot = await notesRef.where('userId','==',userID).get(); // snapshot is Promise object
+    if (snapshot.empty) {
+      console.log('No matching documents.');
+      return;
+    }  
+    // Prints query results to console
+    snapshot.forEach(doc => {
+      console.log(doc.id, '=>', doc.data());
+    });
 
-  const notesRef = db.collection('Notes'); // reference to Notes collection
-  // query sticky notes from userID
-  const snapshot = await notesRef.where('userId','==',userID).get(); // snapshot is Promise object
-  if (snapshot.empty) {
-    console.log('No matching documents.');
-    return;
-  }  
-  // Prints query results to console
-  snapshot.forEach(doc => {
-    console.log(doc.id, '=>', doc.data());
-  });
+    // convert to array of data of all elements
+    const userNotes = snapshot.docs.map((doc) => doc.data());
+    res.json(userNotes); // send query results
 
-  res.send(snapshot); // send query results
-
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      error: "Retrieving sticky notes failed"
+    });
+  }
+    
 });
-
 
 
 
