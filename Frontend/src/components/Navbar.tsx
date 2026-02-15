@@ -87,6 +87,16 @@ export default function Navbar() {
               Map
             </Link>
 
+            {isAuthed && (
+              <Link
+                to={`/u/${myUsername}`}
+                className="rounded-full px-4 py-2 text-sm font-semibold transition border
+               bg-white/55 border-white/40 text-[#2B253A] hover:bg-white/75"
+              >
+                Profile
+              </Link>
+            )}
+
             {isAuthed ? (
               <button
                 onClick={logout}
@@ -102,16 +112,6 @@ export default function Navbar() {
                            bg-white/55 border-white/40 text-[#2B253A] hover:bg-white/75"
               >
                 Log in
-              </Link>
-            )}
-
-            {isAuthed && (
-              <Link
-                to={`/u/${myUsername}`}
-                className="rounded-full px-4 py-2 text-sm font-semibold transition border
-               bg-white/55 border-white/40 text-[#2B253A] hover:bg-white/75"
-              >
-                Profile
               </Link>
             )}
           </div>
