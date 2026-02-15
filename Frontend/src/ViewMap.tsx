@@ -6,12 +6,17 @@
 
 import React, { useEffect, useState } from 'react'
 import { useJsApiLoader, GoogleMap, Marker } from '@react-google-maps/api'
+import { useNavigate } from "react-router-dom";
+import Navbar from './components/Navbar';
 
 // map spawn point: uofc
 const center = { lat: 51.0802, lng: -114.1304 }
 
 function ViewMap() {
   // misc ----------------------------------
+  // For react router and navigation for now
+  const navigate = useNavigate();
+
   // for making sure map is loaded, else, puts placeholder text
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY
@@ -50,6 +55,10 @@ function ViewMap() {
 
   // react component -----------------------
   return (
+  
+  return (<>
+    <Navbar />
+
     <div
     // style={{
     //   display: 'flex',
@@ -103,7 +112,7 @@ function ViewMap() {
     </div>
 
     
-  );
+  </>);
 };
 
 export default ViewMap
