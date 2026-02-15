@@ -1,12 +1,15 @@
 const express = require('express');
 const app = express();
 const db = require('./config/firebase');
-const accountstuff = require('./accountstuff');
-const stickystuff = require('./stickytuff'); 
+const accountstuff = require('./accountroutes');
+const stickystuff = require('./stickyroutes'); 
 
 // serves as a "main page " for the backend 
 
 app.use(express.json());
+
+app.use('/account', accountstuff)
+app.use('/notes', stickystuff)
 
 // app.get('/', async (req, res) => { // root route confirmation message 
 //   try {
@@ -17,9 +20,6 @@ app.use(express.json());
 //     res.status(500).send(error.message);
 //   }
 // });
-
-
-
 
 app.listen(3000, () => {
   console.log('Server running on port 3000');
