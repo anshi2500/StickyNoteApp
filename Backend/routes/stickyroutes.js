@@ -32,6 +32,7 @@ router.post('/addnote', async (req, res) => {
       Timestamp: new Date(),
       Tags: tags || [],
       Category: category,
+      Prompt: prompt || "",  // if there is prompt store it, otherwise an empty string 
       XCoord: xcoord,
       YCoord: ycoord
     };
@@ -53,40 +54,56 @@ router.post('/addnote', async (req, res) => {
 
 
 
-
-// delete a sticky note
-
-
-
-
-
-
-
-
-
 // fetch all sticky notes in the data that are within a certain distance range 
 
-// router.get('/fetchAll'), async (req, res) => {
-//     try{
-//         const {  xcoord, ycoord } = req.body; // input is just user location and then we can query all the stickies in that area
+router.get('/fetchAll', async (req, res) => {
+    try{
+        const { userx,usery } = req.query; // input is just user location and then we can query all the stickies in that area
+       
+        const x = parseFloat(userx); // convert these to floats 
+        const y = parseFloat(usery);
 
-//         const snapshot = 
+        if (isNaN(x)|| isNaN(y)){
+           return res.status(400).json({
+            error: "Incomplete or Invalid Coordinates"
+         });
+
+        }
+        
+        // define logitude and latitiude ranges the sticky must satify both ranges 
+        const xrange_min = x - 0.00025;
+        const xrange_max = x + 0.00025;
+
+        const yrange_min = y - 0.00025;
+        const yrange_max = y + 0.00025; 
+
+        const snapshot = await db.collection('Notes')
+        .where('XCoord', '>=', xrange_min) // can only filter on one attribute in firestore 
+        .where('XCoord', '<=', xrange_max)
+        .get();
+
+        const stickers = snapshot.docs
+        .map(doc => ({ id: doc.id, ...doc.data() }))
+        .filter(note =>
+            note.YCoord >= yrange_min &&
+            note.YCoord <= yrange_max
+        );
+
+      
+        return res.status(200).json(stickers) // status message for successfully pulled stickers 
+    }
+
+    catch(error){
+       console.error(error);
+        res.status(500).json({
+        error: "Error fetching stickies in your area"
+
+    });
 
 
+ }
 
-
-
-//     }
-
-//     catch(error){
-//        console.error(error);
-//         res.status(500).json({
-//        error: "Error fetching stickies in your area"
-
-//     });
-
-
-// }
+}
 
 
 
