@@ -103,7 +103,7 @@ router.get('/fetchAll', async (req, res) => {
 
  }
 
-}
+});
 
 
 // fetch all sticky notes from a user

@@ -22,6 +22,14 @@ type Props = {
   defaultY?: number; // lat
 };
 
+const PROMPT_OPTIONS = [
+  "What do you want future visitors to know?",
+  "What memory is tied to this place?",
+  "What changed here over time?",
+] as const;
+
+type PromptOption = "" | (typeof PROMPT_OPTIONS)[number];
+
 export default function CreateStickyModal({
   open,
   onClose,
@@ -41,7 +49,7 @@ export default function CreateStickyModal({
   const [body, setBody] = useState("");
   const [tags, setTags] = useState(""); // comma-separated input
   const [category, setCategory] = useState("general");
-  const [prompt, setPrompt] = useState("");
+  const [prompt, setPrompt] = useState<PromptOption>("");
   const [visibility, setVisibility] = useState<Visibility>("public");
 
   const storedUser = useMemo(() => {
@@ -113,7 +121,7 @@ export default function CreateStickyModal({
     try {
       setLoading(true);
 
-      const res = await fetch(`${API_BASE}/sticky/create`, {
+      const res = await fetch(`${API_BASE}/notes/addnote`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -198,7 +206,7 @@ export default function CreateStickyModal({
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="e.g. Best sunset view"
-                className="w-full bg-transparent outline-none text-sm placeholder:text-[#4B3F66]/60"
+                className="w-full bg-transparent outline-none text-sm placeholder:text-[#4B3F66]/60 text-[#4B3F66]"
               />
             </div>
           </div>
@@ -212,7 +220,7 @@ export default function CreateStickyModal({
                 onChange={(e) => setBody(e.target.value)}
                 placeholder="Write your sticky note..."
                 rows={4}
-                className="w-full resize-none bg-transparent outline-none text-sm placeholder:text-[#4B3F66]/60"
+                className="w-full resize-none bg-transparent outline-none text-sm placeholder:text-[#4B3F66]/60 text-[#4B3F66]"
               />
             </div>
           </div>
@@ -226,7 +234,7 @@ export default function CreateStickyModal({
                   value={tags}
                   onChange={(e) => setTags(e.target.value)}
                   placeholder="food, view, study"
-                  className="w-full bg-transparent outline-none text-sm placeholder:text-[#4B3F66]/60"
+                  className="w-full bg-transparent outline-none text-sm placeholder:text-[#4B3F66]/60 text-[#4B3F66]"
                 />
               </div>
               <p className="mt-1 text-[11px] text-[#4B3F66]/80">comma-separated</p>
@@ -253,14 +261,23 @@ export default function CreateStickyModal({
           {/* Prompt + Visibility */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs sm:text-sm font-medium text-[#4B3F66] mb-2">Prompt (optional)</label>
+              <label className="block text-xs sm:text-sm font-medium text-[#4B3F66] mb-2">
+                Prompt (optional)
+              </label>
+
               <div className="rounded-2xl border border-white/60 bg-white/70 px-3 py-2.5 focus-within:ring-4 focus-within:ring-[#D3D3FF]/70">
-                <input
+                <select
                   value={prompt}
-                  onChange={(e) => setPrompt(e.target.value)}
-                  placeholder="e.g. What should people try here?"
-                  className="w-full bg-transparent outline-none text-sm placeholder:text-[#4B3F66]/60"
-                />
+                  onChange={(e) => setPrompt(e.target.value as PromptOption)}
+                  className="w-full bg-transparent outline-none text-sm text-[#2B253A]"
+                >
+                  <option value="">None</option>
+                  {PROMPT_OPTIONS.map((p) => (
+                    <option key={p} value={p}>
+                      {p}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
 
