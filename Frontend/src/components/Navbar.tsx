@@ -40,6 +40,9 @@ export default function Navbar() {
     );
   };
 
+  const user = JSON.parse(localStorage.getItem("user") || "null") as null | { name?: string; email?: string; username?: string };
+  const myUsername = user?.username || user?.email?.split("@")[0] || "me";
+
   return (
     <header className="sticky top-0 z-40 w-full">
       <div className="w-full bg-[#DCC9FE]/80 backdrop-blur-md border-b border-white/40">
@@ -99,6 +102,16 @@ export default function Navbar() {
                            bg-white/55 border-white/40 text-[#2B253A] hover:bg-white/75"
               >
                 Log in
+              </Link>
+            )}
+
+            {isAuthed && (
+              <Link
+                to={`/u/${myUsername}`}
+                className="rounded-full px-4 py-2 text-sm font-semibold transition border
+               bg-white/55 border-white/40 text-[#2B253A] hover:bg-white/75"
+              >
+                Profile
               </Link>
             )}
           </div>
