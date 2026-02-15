@@ -54,8 +54,6 @@ function ViewMap() {
 
 
   // react component -----------------------
-  return (
-  
   return (<>
     <Navbar />
 
