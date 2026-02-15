@@ -1,15 +1,22 @@
 // google maps api with react source: Mafia Codes on YouTube
 // https://www.youtube.com/watch?v=iP3DnhCUIsE
 
+// adding marker on map using touch or tap: Hitesh Sahu on Stackoverflow
+// https://stackoverflow.com/questions/17143129/add-marker-on-android-google-map-via-touch-or-tap
+
 import React, { useEffect, useState } from 'react'
 import { useJsApiLoader, GoogleMap, Marker } from '@react-google-maps/api'
 import { useNavigate } from "react-router-dom";
 import Navbar from './components/Navbar';
+import MapBar from './components/MapBar';
+
+import crosshair from './images/crosshair.png';
 
 // map spawn point: uofc
 const center = { lat: 51.0802, lng: -114.1304 }
 
 function ViewMap() {
+  // misc ----------------------------------
   // For react router and navigation for now
   const navigate = useNavigate();
 
@@ -18,18 +25,35 @@ function ViewMap() {
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY
   })
 
+
+  // state vars ----------------------------
   // const [map, setMap] = useState(/** @type google.maps.Map */ (null))
   const [map, setMap] = useState<google.maps.Map | null>(null)
-
-  // useEffect(() => {
-  //   if (!map) return; // map not loaded yet
-
-  //   map.setZoom(12);
-  //   map.panTo({ lat: 51.0802, lng: -114.1304 });
-  // }, [map]);
+  const [enableClickListener, setClickListener] = useState(false)
 
 
+  // use effects ---------------------------
+  useEffect(() => {
+    // if map not loaded yet
+    if (!map) return;
 
+    // if listener off
+    if (!enableClickListener) return;
+
+    // attach listener
+    const listener = map.addListener("click", (e: { latLng: { toJSON: () => any } }) => { 
+      console.log("Map clicked at:", e.latLng?.toJSON())
+    })
+    
+    // cleans up when:
+    // -> enableClickListener changes
+    // -> map changes
+    // -> component unmounts
+    return () => listener.remove()
+  }, [map]);
+
+
+  // functions ---------------------------
   if (!isLoaded) {
     return (
       <div>
@@ -39,7 +63,9 @@ function ViewMap() {
       </div>
     )
   }
-  
+
+
+  // react component -----------------------
   return (<>
     <Navbar />
 
@@ -59,7 +85,6 @@ function ViewMap() {
     min-w-screen 
     bg-amber-100"
     >
-
       <div 
       // style={{
       // display: 'flex',
@@ -92,7 +117,17 @@ function ViewMap() {
 
         </GoogleMap>
 
+        {/* center marker overlay */}
+        <div 
+        className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+          <img src={crosshair} alt="center crosshair" className="h-4 w-4" />
+          {/* <svg className="w-6 h-6 text-[#4B3F66]">
+            <use href="/crosshair.svg#icon" />
+          </svg> */}
+        </div>
+
       </div>
+      <MapBar />
     </div>
 
     
