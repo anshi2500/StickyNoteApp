@@ -16,7 +16,7 @@ router.post('/register', async (req, res) => {
     // edge cases, make sure there is both a username and password
     // otherwise return a client error response 
     if (!username || !password){
-         return res.status(400).json({error: "Registration failed"});
+         return res.status(400).json({error: "Need a username and password"});
 
     }
     // usernames cannot be the same return an error if it already exists in the server 
@@ -56,12 +56,89 @@ router.post('/register', async (req, res) => {
 
 
 
-// authenticate account
+// authenticate account, login is always post 
+router.post('/login', async (req, res) => {
+    try{
+        const { username, password } = req.body;
+
+        // no username or password
+        if (!username || !password){
+         return res.status(400).json({error: "Need a username and password"});
+        }
+        
+        // username doesnt exist 
+        const snapshot = await db.collection('Users').where('Username', '==', username).get(); // snapshot should only be one row 
+        
+         if (snapshot.empty){
+             return res.status(401).json({error: "Username or Password is wrong"});
+         }
+
+        // wrong password
+        const username_match = snapshot.docs[0].data() // get the first row that matches the snapshot query, there should only be one username anyway
+
+        const password_match = await bcrypt.compare(password, username_match.Password)
+
+        if (!password_match){
+            return res.status(401).json({error: "Username or Password is wrong"});
+        }
+
+        res.status(200).json({
+        message: "Login successful",
+        userId: snapshot.docs[0].id
+        });
+    }
+    catch(error){
+        console.error(error);
+        res.status(500).json({error: "Log in failed"}); // 500 is an http status code for internal server errror 
+    }
+
+});
 
 
+// delete account 
+router.delete('/deleteAccount', async (req, res) => {
+    try{
+        // extend on user authentication 
+         const { username, password } = req.body;
+
+        // no username or password
+        if (!username || !password){
+         return res.status(400).json({error: "Need a username and password"});
+        }
+        
+        // username doesnt exist 
+        const snapshot = await db.collection('Users').where('Username', '==', username).get(); // snapshot should only be one row 
+        
+         if (snapshot.empty){
+             return res.status(401).json({error: "Username or Password is wrong"});
+         }
+
+        // wrong password
+        const username_match = snapshot.docs[0].data() // get the first row that matches the snapshot query, there should only be one username anyway
+
+        const password_match = await bcrypt.compare(password, username_match.Password)
+
+        if (!password_match){
+            return res.status(401).json({error: "Username or Password is wrong"});
+        }
+
+        await db.collection('Users').doc(snapshot.docs[0].id).delete();
+
+        res.status(200).json({
+        message: "Deletion was successful"
+        });
+
+   
+    }
+    catch(error){
+        console.error(error);
+        res.status(500).json({error: "Account Deletion Failed"});
+
+     }
+
+}); 
 
 
-// delete account??
 
 
 
