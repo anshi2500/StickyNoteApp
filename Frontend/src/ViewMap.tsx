@@ -8,6 +8,7 @@ import React, { useEffect, useState } from 'react'
 import { useJsApiLoader, GoogleMap, Marker } from '@react-google-maps/api'
 import { useNavigate } from "react-router-dom";
 import Navbar from './components/Navbar';
+import MapBar from './components/MapBar';
 
 // map spawn point: uofc
 const center = { lat: 51.0802, lng: -114.1304 }
@@ -26,18 +27,27 @@ function ViewMap() {
   // state vars ----------------------------
   // const [map, setMap] = useState(/** @type google.maps.Map */ (null))
   const [map, setMap] = useState<google.maps.Map | null>(null)
+  const [enableClickListener, setClickListener] = useState(false)
 
 
   // use effects ---------------------------
   useEffect(() => {
-    if (!map) return; // map not loaded yet
+    // if map not loaded yet
+    if (!map) return;
 
+    // if listener off
+    if (!enableClickListener) return;
+
+    // attach listener
     const listener = map.addListener("click", (e: { latLng: { toJSON: () => any } }) => { 
       console.log("Map clicked at:", e.latLng?.toJSON())
     })
     
-    return () => listener.remove() // cleanup
-
+    // cleans up when:
+    // -> enableClickListener changes
+    // -> map changes
+    // -> component unmounts
+    return () => listener.remove()
   }, [map]);
 
 
@@ -73,7 +83,6 @@ function ViewMap() {
     min-w-screen 
     bg-amber-100"
     >
-
       <div 
       // style={{
       // display: 'flex',
@@ -105,8 +114,8 @@ function ViewMap() {
           <Marker position={center}/>
 
         </GoogleMap>
-
       </div>
+      <MapBar />
     </div>
 
     
