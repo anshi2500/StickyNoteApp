@@ -45,7 +45,7 @@ export default function Navbar() {
 
   return (
     <header className="sticky top-0 z-40 w-full">
-      <div className="w-full bg-[#DCC9FE]/80 backdrop-blur-md border-b border-white/40">
+      <div className="w-full bg-[#DCC9FE]/80 backdrop-blur-md border-b border-black/40">
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6">
           {/* Left: brand */}
           <div className="flex items-center gap-3 select-none pointer-events-none">
@@ -65,33 +65,20 @@ export default function Navbar() {
               to="/home"
               className={[
                 "rounded-full px-4 py-2 text-sm font-semibold transition border",
-                "bg-white/55 border-white/40 text-[#4B3F66] hover:bg-white/75",
-                location.pathname === "/home"
-                  ? "bg-[#D3D3FF] text-[#2B253A] border-white/60 shadow-sm"
+                "bg-white/55 border-black/40 text-[#4B3F66] hover:bg-white/75",
+                location.pathname === "/map"
+                  ? "bg-[#D3D3FF] text-[#2B253A] border-black/60 shadow-sm"
                   : "",
               ].join(" ")}
             >
               Home
             </Link>
 
-            <Link
-              to="/map"
-              className={[
-                "rounded-full px-4 py-2 text-sm font-semibold transition border",
-                "bg-white/55 border-white/40 text-[#4B3F66] hover:bg-white/75",
-                location.pathname === "/map"
-                  ? "bg-[#D3D3FF] text-[#2B253A] border-white/60 shadow-sm"
-                  : "",
-              ].join(" ")}
-            >
-              Map
-            </Link>
-
             {isAuthed && (
               <Link
                 to={`/u/${myUsername}`}
                 className="rounded-full px-4 py-2 text-sm font-semibold transition border
-               bg-white/55 border-white/40 text-[#2B253A] hover:bg-white/75"
+               bg-white/55 border-black/40 text-[#2B253A] hover:bg-white/75"
               >
                 Profile
               </Link>
@@ -101,7 +88,7 @@ export default function Navbar() {
               <button
                 onClick={logout}
                 className="rounded-full px-4 py-2 text-sm font-semibold transition border
-                           bg-white/55 border-white/40 text-[#2B253A] hover:bg-white/75"
+                           bg-white/55 border-black/40 text-[#2B253A] hover:bg-white/75"
               >
                 Log out
               </button>
