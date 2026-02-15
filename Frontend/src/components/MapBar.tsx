@@ -32,14 +32,32 @@ export default function MapBar() {
   const [createSticky, setCreateSticky] = useState(false);
   const [StickiesInRange, setStickiesInRange] = useState([]);
 
-  const fetchStickiesInRange = async () => {
-    const backendEndpoint = 'http://127.0.0.1:5000/student_courses/' + user['id'];
-    const response = await fetch (backendEndpoint);
-    const data = await response.json();
+  // const fetchStickiesInRange = async () => {
+  //   const backendEndpoint = 'http://127.0.0.1:5000/student_courses/' + user['id'];
+  //   const response = await fetch (backendEndpoint);
+  //   const data = await response.json();
 
-    setStickiesInRange(data['student_courses'])
-    console.log(data['student_courses'])
-  };
+  //   setStickiesInRange(data['student_courses'])
+  //   console.log(data['student_courses'])
+  // };
+
+  async function fetchNearbyStickies(userx: number, usery: number) {
+  try {
+    const res = await fetch(
+      `http://localhost:5000/fetchAll?userx=${userx}&usery=${usery}`
+    );
+
+    if (!res.ok) {
+      throw new Error("Failed to fetch stickies");
+    }
+
+    const data = await res.json();
+    return data; // array of stickers
+  } catch (err) {
+    console.error(err);
+    return [];
+  }
+}
 
   return (
     <header className="sticky top-0 z-40 w-full">
@@ -86,7 +104,9 @@ export default function MapBar() {
                 "rounded-full px-1.5 py-0.5 text-[8px] font-semibold leading-none",
                 "bg-white/55 border border-white/40 text-[#4B3F66] hover:bg-white/75 scale-80"
               ].join(" ")}
-              onClick={() => setCreateSticky(!createSticky)}
+              onClick={() => fetchNearbyStickies(clearInterval.lat, clearInterval,lng).then((data) => {
+                setStickiesInRange(data);
+              })}
             >
               Explore Stickies
             </button>
