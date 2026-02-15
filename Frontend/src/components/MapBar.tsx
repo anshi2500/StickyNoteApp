@@ -29,6 +29,12 @@ export default function MapBar() {
   //   );
   // };
 
+  const [createSticky, setCreateSticky] = useState(false);
+
+  useEffect(() => {
+    
+  }, [createSticky])
+
   return (
     <header className="sticky top-0 z-40 w-full">
       <div className="w-full bg-[#DCC9FE]/80 backdrop-blur-md border-b border-white/40">
@@ -40,6 +46,7 @@ export default function MapBar() {
                 "rounded-full px-1.5 py-0.5 text-[8px] font-semibold leading-none",
                 "bg-white/55 border border-white/40 text-[#4B3F66] hover:bg-white/75 scale-80"
               ].join(" ")}
+              onClick={() => setCreateSticky(!createSticky)}
             >
               Create Sticky
             </button>
@@ -62,6 +69,7 @@ export default function MapBar() {
                 "rounded-full px-1.5 py-0.5 text-[8px] font-semibold leading-none",
                 "bg-white/55 border border-white/40 text-[#4B3F66] hover:bg-white/75 scale-80"
               ].join(" ")}
+              onClick={() => setCreateSticky(!createSticky)}
             >
               Create Sticky
             </button>

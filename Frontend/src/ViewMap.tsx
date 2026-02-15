@@ -98,6 +98,7 @@ function ViewMap() {
       w-full 
       bg-white"
       >
+        
         <GoogleMap
           center = {center}
           zoom = {18}
@@ -126,8 +127,6 @@ function ViewMap() {
       </div>
       <MapBar />
     </div>
-
-    
   </>);
 };
 
