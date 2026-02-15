@@ -4,6 +4,7 @@
 import React, { useEffect, useState } from 'react'
 import { useJsApiLoader, GoogleMap, Marker } from '@react-google-maps/api'
 import { useNavigate } from "react-router-dom";
+import Navbar from './components/Navbar';
 
 // map spawn point: uofc
 const center = { lat: 51.0802, lng: -114.1304 }
@@ -38,17 +39,9 @@ function ViewMap() {
       </div>
     )
   }
-
-  const logout = () => {
-    localStorage.removeItem("authed");
-    navigate("/login", { replace: true });
-  };
   
   return (<>
-
-    <div>
-      <button onClick={logout}>Log out</button>
-    </div>
+    <Navbar />
 
     <div
     // style={{
