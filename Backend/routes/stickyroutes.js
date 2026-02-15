@@ -7,9 +7,9 @@ const db = require('./config/firebase');
 // create a sticky note, this sticky note will have a user account attached to it too
 router.post('/addnote', async (req, res) => {
   try {
-    const { username, title, body, tags, category } = req.body;
+    const { username, title, body, tags, category, xcoord, ycoord } = req.body;
 
-    if (!username || !title || !body || !category) {
+    if (!username || !title || !body || !category || !xcoord || !ycoord) {
       return res.status(400).json({
         error: "Incomplete sticky note"
       });
@@ -31,7 +31,9 @@ router.post('/addnote', async (req, res) => {
       Body: body,
       Timestamp: new Date(),
       Tags: tags || [],
-      Category: category
+      Category: category,
+      XCoord: xcoord,
+      YCoord: ycoord
     };
 
     const note = await db.collection('Notes').add(data);
