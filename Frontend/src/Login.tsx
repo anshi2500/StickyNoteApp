@@ -12,16 +12,60 @@ export default function Login() {
   const [regConfirm, setRegConfirm] = useState("");
   const [regError, setRegError] = useState<string | null>(null);
 
+  const API_BASE = "http://localhost:3000";
+
+  const [loginError, setLoginError] = useState<string | null>(null);
+  const [loginLoading, setLoginLoading] = useState(false);
+
+  const [regLoading, setRegLoading] = useState(false);
+
   const navigate = useNavigate();
   const firstRegInputRef = useRef<HTMLInputElement | null>(null);
 
-  const onSubmit = (e: React.FormEvent) => {
+  const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (username.trim() && password.trim()) {
+    setLoginError(null);
+
+    if (!username.trim() || !password.trim()) {
+      setLoginError("Please enter username and password.");
+      return;
+    }
+
+    try {
+      setLoginLoading(true);
+
+      const res = await fetch(`${API_BASE}/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          username: username.trim(),
+          password: password.trim(),
+        }),
+      });
+
+      // If backend returns JSON like { message } on error
+      if (!res.ok) {
+        const maybe = await res.json().catch(() => null);
+        throw new Error(maybe?.message || `Login failed (${res.status})`);
+      }
+
+      const data = await res.json().catch(() => ({}));
+
+      // Store user + auth (hackathon style)
       localStorage.setItem("authed", "true");
+      localStorage.setItem("user", JSON.stringify({ username: username.trim() }));
+
+      // If backend returns a token, store it too (optional)
+      if (data?.token) localStorage.setItem("token", data.token);
+
       navigate("/map", { replace: true });
+    } catch (err: any) {
+      setLoginError(err.message || "Login failed.");
+    } finally {
+      setLoginLoading(false);
     }
   };
+
 
   const openRegister = () => {
     setRegError(null);
@@ -50,7 +94,7 @@ export default function Login() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showRegister]);
 
-  const submitRegister = (e: React.FormEvent) => {
+  const submitRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setRegError(null);
 
@@ -58,16 +102,37 @@ export default function Login() {
     if (regPassword.length < 6) return setRegError("Password must be at least 6 characters.");
     if (regPassword !== regConfirm) return setRegError("Passwords do not match.");
 
-    // Hackathon/demo registration:
-    // Save the user locally, and log them in.
-    localStorage.setItem(
-      "user",
-      JSON.stringify({ username: regUsername.trim() })
-    );
-    localStorage.setItem("authed", "true");
+    try {
+      setRegLoading(true);
 
-    closeRegister();
-    navigate("/map", { replace: true });
+      const res = await fetch(`${API_BASE}/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          username: regUsername.trim(),
+          password: regPassword,
+        }),
+      });
+
+      if (!res.ok) {
+        const maybe = await res.json().catch(() => null);
+        throw new Error(maybe?.message || `Register failed (${res.status})`);
+      }
+
+      const data = await res.json().catch(() => ({}));
+
+      // auto-login after register
+      localStorage.setItem("user", JSON.stringify({ username: regUsername.trim() }));
+      localStorage.setItem("authed", "true");
+      if (data?.token) localStorage.setItem("token", data.token);
+
+      closeRegister();
+      navigate("/map", { replace: true });
+    } catch (err: any) {
+      setRegError(err.message || "Register failed.");
+    } finally {
+      setRegLoading(false);
+    }
   };
 
   return (
@@ -127,6 +192,12 @@ export default function Login() {
                 Log in to view the community map.
               </p>
 
+              {loginError && (
+                <div className="mt-3 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                  {loginError}
+                </div>
+              )}
+
               {/* Username */}
               <div className="mt-4 sm:mt-6">
                 <label className="block text-xs sm:text-sm font-medium text-[#4B3F66] mb-2">
@@ -170,11 +241,13 @@ export default function Login() {
 
               <button
                 type="submit"
+                disabled={loginLoading}
                 className="mt-4 sm:mt-6 w-full rounded-full py-2.5 sm:py-3 text-xs sm:text-sm font-semibold
-               text-[#2B253A] bg-[#D3D3FF] hover:bg-[#C7C7FF]
-               active:translate-y-[1px] transition shadow-md"
+             text-[#2B253A] bg-[#D3D3FF] hover:bg-[#C7C7FF]
+             active:translate-y-[1px] transition shadow-md
+             disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                Log in
+                {loginLoading ? "Logging in..." : "Log in"}
               </button>
 
               <button
@@ -292,10 +365,12 @@ export default function Login() {
 
                 <button
                   type="submit"
+                  disabled={regLoading}
                   className="mt-2 w-full rounded-full py-2.5 text-sm font-semibold text-[#2B253A]
-               bg-[#D3D3FF] hover:bg-[#C7C7FF] active:translate-y-[1px] transition shadow-md"
+             bg-[#D3D3FF] hover:bg-[#C7C7FF] active:translate-y-[1px] transition shadow-md
+             disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                  Create account
+                  {regLoading ? "Creating..." : "Create account"}
                 </button>
 
                 <button
