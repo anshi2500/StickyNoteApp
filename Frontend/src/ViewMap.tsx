@@ -10,8 +10,8 @@ import { useNavigate } from "react-router-dom";
 import Navbar from './components/Navbar';
 import MapBar from './components/MapBar';
 
+import crosshair from './images/crosshair.png';
 import CreateStickyModal from './components/CreateStickyModal';
-import crosshair from './images/crosshair.svg';
 
 // map spawn point: uofc
 const center = { lat: 51.0802, lng: -114.1304 }
@@ -110,7 +110,6 @@ function ViewMap() {
       w-full 
       bg-white"
       >
-        
         <GoogleMap
           center={center}
           zoom={18}
@@ -126,14 +125,17 @@ function ViewMap() {
           }}
           onLoad={map => setMap(map)}
         >
-          {/* <Marker position={center}/> */}
+          <Marker position={center} />
 
         </GoogleMap>
 
         {/* center marker overlay */}
-        <div 
-        className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-0 -translate-y-20">
+        <div
+          className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
           <img src={crosshair} alt="center crosshair" className="h-4 w-4" />
+          {/* <svg className="w-6 h-6 text-[#4B3F66]">
+            <use href="/crosshair.svg#icon" />
+          </svg> */}
         </div>
 
       </div>
@@ -148,6 +150,8 @@ function ViewMap() {
       />
 
     </div>
+
+
   </>);
 };
 
