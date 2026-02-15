@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router(); // mini app that lives in the main application 
-const db = require('./config/firebase');
+const db = require('../config/firebase');
 const bcrypt = require('bcrypt'); 
 
 // create an account

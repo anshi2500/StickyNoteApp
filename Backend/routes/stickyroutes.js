@@ -1,15 +1,15 @@
 const express = require('express');
 const router = express.Router();
-const db = require('./config/firebase');
+const db = require('../config/firebase');
 
 // sticky notes are created and deleted within one person's account 
 
 // create a sticky note, this sticky note will have a user account attached to it too
 router.post('/addnote', async (req, res) => {
   try {
-    const { username, title, body, tags, category, xcoord, ycoord } = req.body;
+    const { username, title, body, tags, category, xcoord, ycoord, prompt, visibility } = req.body;
 
-    if (!username || !title || !body || !category || !xcoord || !ycoord) {
+    if (!username || !title || !body || !category || !xcoord || !ycoord || !visibility) {
       return res.status(400).json({
         error: "Incomplete sticky note"
       });
@@ -64,7 +64,35 @@ router.post('/addnote', async (req, res) => {
 
 
 
-// fetch all sticky notes 
+// fetch all sticky notes in the data that are within a certain distance range 
+
+// router.get('/fetchAll'), async (req, res) => {
+//     try{
+//         const {  xcoord, ycoord } = req.body; // input is just user location and then we can query all the stickies in that area
+
+//         const snapshot = 
+
+
+
+
+
+//     }
+
+//     catch(error){
+//        console.error(error);
+//         res.status(500).json({
+//        error: "Error fetching stickies in your area"
+
+//     });
+
+
+// }
+
+
+
+
+// fetch a spcific sticky note for one user 
+
 
 
 
