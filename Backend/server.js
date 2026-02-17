@@ -1,18 +1,25 @@
 const express = require('express');
 const app = express();
 const db = require('./config/firebase');
-const accountstuff = require('./routes/accountroutes'); // functions returned here 
-const stickystuff = require('./routes/stickyroutes'); // return the functions here
+const accountrouter = require('./routes/accountroutes'); // functions returned here 
+const stickyrouter = require('./routes/stickyroutes'); // return the functions here
+// CORS
+const cors = require("cors");
+
+app.use(cors({
+  origin: "http://localhost:5173", // your Vite frontend
+  credentials: true,
+}));
 
 // serves as a "main page " for the backend 
 
 app.use(express.json());
 
-// these are the different domains our backend will be under split into two sections,
+// these are the different domains our backend will be under split into two encapsulations,
 // stuff for accounts and the stickynote stuff 
 
-app.use('/account', accountstuff) // defines the api url to use in the frontend , make naming conventions more simple
-app.use('/notes', stickystuff)
+app.use('/account', accountrouter) // defines the api url to use in the frontend , make naming conventions more simple
+app.use('/notes', stickyrouter)
 
 
 
