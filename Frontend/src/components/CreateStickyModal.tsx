@@ -146,7 +146,7 @@ export default function CreateStickyModal({
   const lat = Number.isFinite(defaultY) ? Number(defaultY).toFixed(6) : "—";
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center px-4" role="dialog" aria-modal="true">
+    <div className="fixed inset-0 z-100 flex items-center justify-center px-4" role="dialog" aria-modal="true">
       {/* Backdrop: click off to close */}
       <button
         type="button"

@@ -44,7 +44,7 @@ export default function Navbar() {
   const myUsername = user?.username || user?.email?.split("@")[0] || "me";
 
   return (
-    <header className="sticky top-0 z-40 w-full">
+    <header className="sticky top-0 z-60 w-full">
       <div className="w-full bg-[#DCC9FE]/80 backdrop-blur-md border-b border-black/40">
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6">
           {/* Left: brand */}

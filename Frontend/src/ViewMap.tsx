@@ -45,6 +45,8 @@ function ViewMap() {
     }
   };
 
+  const myUsername = getUsername();
+
   // keep mapCenter updated when map stops moving
   useEffect(() => {
     if (!map) return;
@@ -78,7 +80,15 @@ function ViewMap() {
         throw new Error(data?.error || data?.message || `Fetch failed (${res.status})`);
       }
 
-      setStickies(Array.isArray(data) ? data : []);
+      const arr = Array.isArray(data) ? data : Array.isArray(data?.stickies) ? data.stickies : [];
+
+      const filtered = arr.filter((s: Sticky) => {
+        const vis = (s.Visibility || "public").toLowerCase();
+        if (vis !== "private") return true;
+        return (s.Username || "").trim().toLowerCase() === myUsername.trim().toLowerCase();
+      });
+
+      setStickies(filtered);
     } catch (err: any) {
       setStickiesError(err.message || "Failed to fetch stickies.");
     } finally {
@@ -93,6 +103,15 @@ function ViewMap() {
       </div>
     );
   }
+
+  const formatTags = (tags?: string[] | string) => {
+    if (!tags) return [];
+    if (Array.isArray(tags)) return tags.filter(Boolean);
+    return tags
+      .split(",")
+      .map((t) => t.trim())
+      .filter(Boolean);
+  };
 
   return (
     <>
@@ -147,28 +166,69 @@ function ViewMap() {
                 <div className="text-sm text-[#4B3F66]">No stickies fetched yet.</div>
               ) : (
                 <div className="space-y-2">
-                  {stickies.map((s) => (
-                    <div key={s.id} className="rounded-2xl bg-white/70 border border-white/60 p-3">
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="min-w-0">
-                          <div className="text-sm font-semibold text-[#2B253A] truncate">
-                            {s.Title || "Untitled"}
-                          </div>
-                          <div className="text-xs text-[#4B3F66]">
-                            @{s.Username || "anon"} {s.Category ? `• ${s.Category}` : ""}{" "}
-                            {s.Visibility ? `• ${s.Visibility}` : ""}
-                          </div>
-                        </div>
-                        <div className="text-[11px] text-[#4B3F66]/80 tabular-nums">
-                          {Number(s.YCoord).toFixed(4)}, {Number(s.XCoord).toFixed(4)}
-                        </div>
-                      </div>
+                  {stickies.map((s) => {
+                    const tagList = formatTags(s.Tags);
 
-                      {s.Body ? (
-                        <div className="mt-2 text-sm text-[#4B3F66] whitespace-pre-wrap">{s.Body}</div>
-                      ) : null}
-                    </div>
-                  ))}
+                    return (
+                      <div key={s.id} className="rounded-2xl bg-white/70 border border-white/60 p-3">
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="min-w-0">
+                            <div className="text-sm font-semibold text-[#2B253A] truncate">
+                              {s.Title || "Untitled"}
+                            </div>
+
+                            {/* meta line */}
+                            <div className="mt-0.5 text-xs text-[#4B3F66] flex flex-wrap items-center gap-x-2 gap-y-1">
+                              <span>@{s.Username || "anon"}</span>
+
+                              {s.Visibility && (
+                                <span className="rounded-full border border-white/60 bg-white/60 px-2 py-0.5 text-[11px] font-semibold text-[#2B253A]">
+                                  {s.Visibility}
+                                </span>
+                              )}
+
+                              {s.Category && (
+                                <span className="rounded-full border border-white/60 bg-white/60 px-2 py-0.5 text-[11px] font-semibold text-[#2B253A]">
+                                  {s.Category}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+
+                          <div className="text-[11px] text-[#4B3F66]/80 tabular-nums text-right">
+                            {Number(s.YCoord).toFixed(4)}, {Number(s.XCoord).toFixed(4)}
+                          </div>
+                        </div>
+
+                        {/* prompt */}
+                        {s.Prompt ? (
+                          <div className="mt-2 rounded-xl border border-white/60 bg-white/60 px-3 py-2">
+                            <div className="text-[11px] font-semibold text-[#4B3F66]">Prompt</div>
+                            <div className="text-sm text-[#2B253A]">{s.Prompt}</div>
+                          </div>
+                        ) : null}
+
+                        {/* body */}
+                        {s.Body ? (
+                          <div className="mt-2 text-sm text-[#4B3F66] whitespace-pre-wrap">{s.Body}</div>
+                        ) : null}
+
+                        {/* tags */}
+                        {tagList.length > 0 ? (
+                          <div className="mt-3 flex flex-wrap gap-1.5">
+                            {tagList.map((t) => (
+                              <span
+                                key={t}
+                                className="rounded-full border border-white/60 bg-[#D3D3FF]/60 px-2 py-0.5 text-[11px] font-semibold text-[#2B253A]"
+                              >
+                                #{t}
+                              </span>
+                            ))}
+                          </div>
+                        ) : null}
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </div>

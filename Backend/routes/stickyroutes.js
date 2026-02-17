@@ -34,7 +34,8 @@ router.post('/addnote', async (req, res) => {
       Category: category,
       Prompt: prompt || "",  // if there is prompt store it, otherwise an empty string 
       XCoord: xcoord,
-      YCoord: ycoord
+      YCoord: ycoord,
+      Visibility: visibility
     };
 
     const note = await db.collection('Notes').add(data);
@@ -54,87 +55,108 @@ router.post('/addnote', async (req, res) => {
 
 
 
-// fetch all sticky notes in the data that are within a certain distance range 
+router.get("/fetchAll", async (req, res) => {
+  try {
+    const { userx, usery } = req.query;
 
-router.get('/fetchAll', async (req, res) => {
-    try{
-        const { userx,usery } = req.body; // input is just user location and then we can query all the stickies in that area
-       
-        const x = parseFloat(userx); // convert these to floats 
-        const y = parseFloat(usery);
+    const x = parseFloat(userx);
+    const y = parseFloat(usery);
 
-        if (isNaN(x)|| isNaN(y)){
-           return res.status(400).json({
-            error: "Incomplete or Invalid Coordinates"
-         });
-
-        }
-        
-        // define logitude and latitiude ranges the sticky must satify both ranges 
-        const xrange_min = x - 0.00025;
-        const xrange_max = x + 0.00025;
-
-        const yrange_min = y - 0.00025;
-        const yrange_max = y + 0.00025; 
-
-        const snapshot = await db.collection('Notes')
-        .where('XCoord', '>=', xrange_min) // can only filter on one attribute in firestore 
-        .where('XCoord', '<=', xrange_max)
-        .get();
-
-        const stickers = snapshot.docs
-        .map(doc => ({ id: doc.id, ...doc.data() }))
-        .filter(note =>
-            note.YCoord >= yrange_min &&
-            note.YCoord <= yrange_max
-        );
-
-      
-        return res.status(200).json(stickers) // status message for successfully pulled stickers 
+    if (isNaN(x) || isNaN(y)) {
+      return res.status(400).json({ error: "Incomplete or Invalid Coordinates" });
     }
 
-    catch(error){
-       console.error(error);
-        res.status(500).json({
-        error: "Error fetching stickies in your area"
+    const xrange_min = x - 0.00025;
+    const xrange_max = x + 0.00025;
+    const yrange_min = y - 0.00025;
+    const yrange_max = y + 0.00025;
 
+    const snapshot = await db
+      .collection("Notes")
+      .where("XCoord", ">=", xrange_min)
+      .where("XCoord", "<=", xrange_max)
+      .get();
+
+    const notesInX = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+
+    const stickers = notesInX.filter(
+      (note) => note.YCoord >= yrange_min && note.YCoord <= yrange_max
+    );
+
+    // Build unique list of user doc IDs (your Notes store userId as the Users doc id)
+    const userDocIds = [...new Set(stickers.map((s) => s.userId).filter(Boolean))];
+
+    // Fetch user docs in parallel
+    const userDocs = await Promise.all(
+      userDocIds.map((id) => db.collection("Users").doc(id).get())
+    );
+
+    // Map: userId -> Username
+    const userMap = {};
+    userDocs.forEach((d) => {
+      if (d.exists) {
+        const u = d.data();
+        userMap[d.id] = u?.Username || u?.username || "anon";
+      }
     });
 
+    // Attach Username onto each note
+    const enriched = stickers.map((s) => ({
+      ...s,
+      Username: userMap[s.userId] || "anon",
+    }));
 
- }
-
+    return res.status(200).json({ stickies: enriched });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Error fetching stickies in your area" });
+  }
 });
+
 
 
 // fetch all sticky notes from a user
-router.get('/fetchUsersNotes', async (req, res) => {
-  try{
-    // Retreive the user ID from req body
-    const {userID} = req.body;
-    const notesRef = db.collection('Notes'); // reference to Notes collection
-    // query sticky notes from userID
-    const snapshot = await notesRef.where('userId','==',userID).get(); // snapshot is Promise object
-    if (snapshot.empty) {
-      console.log('No matching documents.');
-      return;
-    }  
-    // Prints query results to console
-    snapshot.forEach(doc => {
-      console.log(doc.id, '=>', doc.data());
-    });
+router.get("/fetchUsersNotes", async (req, res) => {
+  try {
+    const { username } = req.query;
 
-    // convert to array of data of all elements
-    const userNotes = snapshot.docs.map((doc) => doc.data());
-    res.json(userNotes); // send query results
+    if (!username || typeof username !== "string") {
+      return res.status(400).json({ error: "Missing username" });
+    }
 
+    const cleanUsername = username.trim();
+
+    // find user by Username
+    const userSnap = await db
+      .collection("Users")
+      .where("Username", "==", cleanUsername)
+      .get();
+
+    if (userSnap.empty) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    // IMPORTANT: use Firestore doc id as the userId
+    const userId = userSnap.docs[0].id;
+
+    // query notes by userId
+    const notesSnap = await db
+      .collection("Notes")
+      .where("userId", "==", userId)
+      .get();
+
+    const userNotes = notesSnap.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+
+    return res.status(200).json({ stickies: userNotes });
   } catch (error) {
     console.error(error);
-    res.status(500).json({
-      error: "Retrieving sticky notes failed"
-    });
+    return res.status(500).json({ error: "Retrieving sticky notes failed" });
   }
-    
 });
+
 
 
 
